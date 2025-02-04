@@ -44,6 +44,11 @@ app.use(morgan('dev'));
 app.use(express.json()); 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// 기본 라우터 (나중에 지우기)
+app.get('/', (req, res) => {
+    res.send('서버가 정상적으로 작동 중입니다.');
+  });
+
 // 라우터 설정
 // const userRoutes = require('./routes/users');
 
