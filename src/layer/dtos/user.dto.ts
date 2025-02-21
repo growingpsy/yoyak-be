@@ -1,10 +1,10 @@
-// src/res/dtos/user/user.dto.ts
 export class CreateUserDto {
     readonly user_name!: string;
     readonly user_nick!: string;
     readonly user_email!: string;
     readonly email_verified!: boolean;
     readonly user_pwd!: string;
+    confirmPassword?: string;
   }
 
   export class UpdateUserDto {
@@ -27,3 +27,7 @@ export class UserResponseDto {
     updated_at!: Date;
   }
   
+  export class VerifyEmailDto {
+    readonly user_email!: string;
+    readonly verification_code!: string;
+  }
