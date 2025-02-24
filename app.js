@@ -5,7 +5,8 @@ const cors = require('cors');
 const swaggerUi = require("swagger-ui-express");
 const swaggerFile = require('./swagger/swagger-output.json');
 //const { sequelize } = require('./models');
-
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 const app = express();
 
 // 서버 포트 설정
@@ -38,7 +39,13 @@ app.use(
 //   .catch((err) => {
 //     console.error(err);
 //   });
-
+prisma.$connect()
+  .then(() => {
+    console.log('데이터베이스 연결 성공');
+  })
+  .catch((err) => {
+    console.error(err);
+  });
 // 미들웨어 설정
 app.use(morgan('dev'));
 app.use(express.json()); 
