@@ -1,0 +1,45 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// 데이터베이스 연동
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// Bookmark 테이블 모델
+model Bookmark {
+  bookmark_id BigInt @id @default(autoincrement()) 
+  created_at  DateTime @default(now())
+  summary_id  BigInt
+
+  //Summary Summary @relation(fields: [summary_id], references: [summary_id], onDelete: Cascade)
+
+@@map("bookmark")
+}
+
+// Summary 테이블 모델
+model Summary {
+  summary_id       BigInt   @id @default(autoincrement()) 
+  summary_text     String  
+  is_long          Boolean 
+  contains_spoiler Boolean  
+  created_at       DateTime @default(now()) 
+  updated_at       DateTime @updatedAt 
+  //content_id       BigInt  
+  //user_id          BigInt  
+
+  //Content Content @relation(fields: [content_id], references: [content_id], onDelete: Cascade)
+  //User User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  @@map("summary") 
+}
+
+//다른 모델 들어오면 주석 해제가능-현재는 오류
