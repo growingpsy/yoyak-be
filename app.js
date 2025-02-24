@@ -4,7 +4,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const swaggerUi = require("swagger-ui-express");
 const swaggerFile = require('./swagger/swagger-output.json');
-const { sequelize } = require('./models');
+//const { sequelize } = require('./models');
 
 const app = express();
 
@@ -31,13 +31,13 @@ app.use(
 );
 
 // 데이터베이스 연결
-sequelize.sync({ force: false })
-  .then(() => {
-    console.log('데이터베이스 연결 성공');
-  })
-  .catch((err) => {
-    console.error(err);
-  });
+// sequelize.sync({ force: false })
+//   .then(() => {
+//     console.log('데이터베이스 연결 성공');
+//   })
+//   .catch((err) => {
+//     console.error(err);
+//   });
 
 // 미들웨어 설정
 app.use(morgan('dev'));
