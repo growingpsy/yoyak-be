@@ -18,23 +18,30 @@ export class AuthService {
     private prisma: PrismaService,
   ) {}
 
-  // 로그인
-  async login(loginDto: LoginDto): Promise<ResponseDto<any>> {
+// 로그인
+async login(loginDto: LoginDto): Promise<ResponseDto<any>> {
+  console.log('[로그인 요청] Email:', loginDto.user_email);
+
+  try {
     const user = await this.prisma.user.findUnique({
       where: { user_email: loginDto.user_email },
     });
 
     if (!user) {
+      console.log('[로그인 실패] 존재하지 않는 이메일:', loginDto.user_email);
       return new ResponseDto(404, '이메일이 존재하지 않습니다.', null);
     }
 
     const isPasswordValid = await bcrypt.compare(loginDto.user_pwd, user.user_pwd);
     if (!isPasswordValid) {
+      console.log('[로그인 실패] 비밀번호 불일치:', loginDto.user_email);
       return new ResponseDto(401, '비밀번호가 일치하지 않습니다.', null);
     }
 
     const payload = { sub: user.user_id, email: user.user_email };
     const token = await this.jwtService.signAsync(payload);
+
+    console.log('[로그인 성공] 사용자 ID:', user.user_id);
 
     return new ResponseDto(200, '로그인 성공', {
       user_id: user.user_id,
@@ -42,9 +49,13 @@ export class AuthService {
       user_name: user.user_name,
       user_nick: user.user_nick,
       email_verified: user.email_verified,
-      access_token: token, // ✅ user 객체 안에 access_token 포함
+      access_token: token,
     });
+  } catch (error) {
+    console.error('[로그인 오류]', error);
+    return new ResponseDto(500, '서버 오류가 발생했습니다.', null);
   }
+}
   // 회원가입
   async register(createUserDto: CreateUserDto) {
     const { user_name, user_nick, user_email, user_pwd, confirmPassword } = createUserDto;
