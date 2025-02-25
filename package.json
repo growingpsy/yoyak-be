@@ -4,10 +4,9 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon npm start",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --config webpack.config.js",
-    "swagger-autogen": "node ./swagger/swagger.js"
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "build": "nest build"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +14,8 @@
   "dependencies": {
     "@nestjs/common": "^11.0.9",
     "@nestjs/core": "^11.0.9",
+    "@nestjs/jwt": "^11.0.0",
+    "@nestjs/platform-express": "^11.0.10",
     "@nestjs/typeorm": "^11.0.0",
     "@prisma/client": "^6.4.1",
     "axios": "^1.7.2",
@@ -37,6 +38,7 @@
     "node-cron": "^3.0.3",
     "nodemailer": "^6.10.0",
     "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
     "sequelize": "^6.37.3",
     "sequelize-auto": "^0.8.8",
     "sequelize-cli": "^6.6.2",
