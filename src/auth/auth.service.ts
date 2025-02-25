@@ -5,6 +5,8 @@ import { CreateUserDto, VerifyEmailDto } from './dto/user.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import * as nodemailer from 'nodemailer';
+import { PrismaService } from '../../prisma/prisma.service';
+import { ResponseDto } from '../layer/dtos/response.dto';
 
 @Injectable()
 export class AuthService {
@@ -13,31 +15,36 @@ export class AuthService {
   constructor(
     private authRepository: AuthRepository,
     private jwtService: JwtService,
+    private prisma: PrismaService,
   ) {}
 
   // 로그인
-  async login(loginDto: LoginDto) {
-    const user = await this.authRepository.findByEmail(loginDto.user_email);
+  async login(loginDto: LoginDto): Promise<ResponseDto<any>> {
+    const user = await this.prisma.user.findUnique({
+      where: { user_email: loginDto.user_email },
+    });
 
     if (!user) {
-      throw new UnauthorizedException('이메일이 존재하지 않습니다.');
+      return new ResponseDto(404, '이메일이 존재하지 않습니다.', null);
     }
 
-    const isPasswordValid = await bcrypt.compare(
-      loginDto.user_pwd,
-      user.user_pwd,
-    );
-
+    const isPasswordValid = await bcrypt.compare(loginDto.user_pwd, user.user_pwd);
     if (!isPasswordValid) {
-      throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
+      return new ResponseDto(401, '비밀번호가 일치하지 않습니다.', null);
     }
 
     const payload = { sub: user.user_id, email: user.user_email };
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-    };
-  }
+    const token = await this.jwtService.signAsync(payload);
 
+    return new ResponseDto(200, '로그인 성공', {
+      user_id: user.user_id,
+      user_email: user.user_email,
+      user_name: user.user_name,
+      user_nick: user.user_nick,
+      email_verified: user.email_verified,
+      access_token: token, // ✅ user 객체 안에 access_token 포함
+    });
+  }
   // 회원가입
   async register(createUserDto: CreateUserDto) {
     const { user_name, user_nick, user_email, user_pwd, confirmPassword } = createUserDto;
