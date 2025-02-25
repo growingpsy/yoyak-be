@@ -8,8 +8,8 @@ export class SummaryModel {
     summary_text: string;
     is_long: boolean;
     contains_spoiler: boolean;
-    content_id: bigint;
-    user_id: bigint;
+    content_id: number;
+    user_id: number;
   }) {
     return prisma.summary.create({
       data: {
@@ -23,7 +23,7 @@ export class SummaryModel {
   }
 
   // 특정 요약 조회
-  async getSummary(summaryId: bigint) {
+  async getSummary(summaryId: number) {
     return prisma.summary.findUnique({
       where: { summary_id: summaryId },
     });
@@ -35,7 +35,7 @@ export class SummaryModel {
   }
 
   // 요약 수정
-  async updateSummary(summaryId: bigint, updateData: Partial<{ summary_text: string; is_long: boolean; contains_spoiler: boolean }>) {
+  async updateSummary(summaryId: number, updateData: Partial<{ summary_text: string; is_long: boolean; contains_spoiler: boolean }>) {
     return prisma.summary.update({
       where: { summary_id: summaryId },
       data: updateData,
@@ -43,7 +43,7 @@ export class SummaryModel {
   }
 
   // 요약 삭제
-  async deleteSummary(summaryId: bigint) {
+  async deleteSummary(summaryId: number) {
     return prisma.summary.delete({
       where: { summary_id: summaryId },
     });
