@@ -33,13 +33,28 @@ model Summary {
   contains_spoiler Boolean  
   created_at       DateTime @default(now()) 
   updated_at       DateTime @updatedAt 
-  //content_id       BigInt  
-  //user_id          BigInt  
+  content_id       BigInt  
+  user_id          BigInt  
 
   //Content Content @relation(fields: [content_id], references: [content_id], onDelete: Cascade)
   //User User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 
   @@map("summary") 
+}
+
+// User 테이블 모델
+model User {
+  user_id        Int      @id @default(autoincrement())
+  user_name      String   @db.VarChar(50)
+  user_nick      String   @db.VarChar(50)
+  user_email     String   @unique @db.VarChar(255)
+  email_verified Boolean  @default(false)
+  user_pwd       String   @db.VarChar(100)
+  ban_count      BigInt   @default(0)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  @@map("user")
 }
 
 //다른 모델 들어오면 주석 해제가능-현재는 오류
