@@ -7,15 +7,14 @@ const options = {
   },
   servers: [
     {
-      "url": "http://localhost:3000",
-      "description": "Local development server"
+      url: 'http://localhost:3000',
+      description: 'Local development server',
     },
     {
-      "url": "https://api.yoyaklery.site",
-      "description": "Production server"
-    }
+      url: 'https://api.yoyaklery.site',
+      description: 'Production server',
+    },
   ],
-  schemes: ['http','https'],
   securityDefinitions: {
     bearerAuth: {
       type: 'http',
@@ -25,6 +24,10 @@ const options = {
     },
   },
 };
+
 const outputFile = './swagger/swagger-output.json';
-const endpointsFiles = ['../app.js'];
-swaggerAutogen(outputFile, endpointsFiles, options);
+const endpointsFiles = ['./src/main.ts']; 
+
+swaggerAutogen(outputFile, endpointsFiles, options).then(() => {
+  console.log('Swagger JSON 생성 완료');
+});

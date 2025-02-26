@@ -1,33 +1,337 @@
 {
-    "openapi": "3.0.0",
-    "info": {
-      "title": "yoyaklery",
-      "description": "yoyaklery API 명세서",
-      "version": "1.0.0"
+  "openapi": "3.0.0",
+  "info": {
+    "title": "yoyaklery",
+    "description": "yoyaklery API 명세서",
+    "version": "1.0.0",
+    "contact": {}
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local development server"
     },
-    "servers": [
-        {
-          "url": "http://localhost:3000",
-          "description": "Local development server"
+    {
+      "url": "https://api.yoyaklery.site",
+      "description": "Production server"
+    }
+  ],
+  "paths": {
+    "/content/now-playing": {
+      "get": {
+        "operationId": "ContentController_getNowPlayingMovies",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
         },
-        {
-          "url": "https://api.yoyaklery.site",
-          "description": "Production server"
-        }
-      ],
-    "paths": {
-
+        "tags": ["Content"]
+      }
     },
-    "components": {
-      "securitySchemes": {
-        "bearerAuth": {
-          "type": "http",
-          "scheme": "bearer",
-          "bearerFormat": "JWT"
+    "/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["Auth"]
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "summary": "회원가입",
+        "description": "새로운 사용자를 등록합니다.",
+        "operationId": "AuthController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "사용자가 성공적으로 등록되었습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "회원가입 성공 메시지",
+                      "example": "회원가입이 완료되었습니다."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청 또는 유효성 검사 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": { "type": "integer", "example": 400 },
+                    "message": { "type": "string", "example": "이메일 형식이 올바르지 않습니다." }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": { "type": "integer", "example": 500 },
+                    "message": { "type": "string", "example": "서버 내부 오류" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Auth"]
+      }
+    },
+    "/auth/send-email": {
+  "post": {
+    "summary": "이메일 인증 코드 전송",
+    "description": "사용자가 이메일 인증 코드를 요청하여 이메일로 전송합니다.",
+    "operationId": "AuthController_sendEmail",
+    "parameters": [],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/SendVerificationCodeDto"
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "이메일 인증 코드가 성공적으로 전송되었습니다.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "description": "이메일 인증 코드 전송 성공 메시지",
+                  "example": "인증 코드가 이메일로 전송되었습니다."
+                }
+              }
+            }
+          }
         }
       },
-      "schemas": {
+      "400": {
+        "description": "잘못된 요청 또는 이메일 오류",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": { "type": "integer", "example": 400 },
+                "message": { "type": "string", "example": "잘못된 이메일 형식입니다." }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal Server Error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": { "type": "integer", "example": 500 },
+                "message": { "type": "string", "example": "서버 내부 오류" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "tags": ["Auth"]
+  }
+},
+"/auth/verify-email": {
+  "post": {
+    "summary": "이메일 인증",
+    "description": "사용자가 이메일 인증 코드를 제출하여 인증을 완료합니다.",
+    "operationId": "AuthController_verifyEmail",
+    "parameters": [],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/VerifyEmailDto"
+          }
+        }
+      }
+    },
+    "responses": {
+      "201": {
+        "description": "이메일 인증이 성공적으로 완료되었습니다.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "description": "이메일 인증 성공 메시지",
+                  "example": "이메일 인증이 완료되었습니다."
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "잘못된 요청 또는 인증 코드 오류",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": { "type": "integer", "example": 400 },
+                "message": { "type": "string", "example": "잘못된 인증 코드입니다." }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal Server Error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": { "type": "integer", "example": 500 },
+                "message": { "type": "string", "example": "서버 내부 오류" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "tags": ["Auth"]
+  }
+}
+  },
 
+"components": {
+  "securitySchemes": {
+    "bearerAuth": {
+      "type": "http",
+      "scheme": "bearer",
+      "bearerFormat": "JWT"
+    }
+  },
+    "schemas": {
+      "LoginDto": {
+        "type": "object",
+        "properties": {}
+      },
+        "CreateUserDto": {
+        "type": "object",
+        "properties": {
+          "user_id": { 
+            "type": "string",
+            "description": "사용자 아이디"
+          },
+          "user_name": {
+            "type": "string",
+            "description": "사용자 이름"
+          },
+          "user_nick": {
+            "type": "string",
+            "description": "사용자 닉네임"
+          },
+          "user_email": {
+            "type": "string",
+            "description": "사용자 이메일"
+          },
+          "user_pwd": {
+            "type": "string",
+            "format": "password",
+            "description": "사용자 비밀번호"
+          },
+          "confirmPassword": {
+            "type": "string",
+            "format": "password",
+            "description": "비밀번호 확인"
+          }   
+        },
+        "required": [
+          "user_id", 
+          "user_name",
+          "user_nick",
+          "user_email",
+          "user_pwd",
+          "confirmPassword"
+        ]
+      },
+      "SendVerificationCodeDto": {
+        "type": "object",
+        "properties": {
+          "user_email": {
+            "type": "string",
+            "format": "email",
+            "description": "사용자의 이메일 주소",
+            "example": "user@example.com"
+          }
+        },
+        "required": ["user_email"]
+      },
+      "VerifyEmailDto": {
+        "type": "object",
+        "properties": {
+          "user_email": {
+            "type": "string",
+            "format": "email",
+            "description": "사용자의 이메일 주소",
+            "example": "user@example.com"
+          },
+          "verification_code": {
+            "type": "string",
+            "description": "이메일로 전송된 인증 코드",
+            "example": "123456"
+          }
+        },
+        "required": ["user_email", "verification_code"]
+        }
       }
     }
   }
