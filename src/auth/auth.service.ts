@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as nodemailer from 'nodemailer';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ResponseDto } from '../layer/dtos/response.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +17,7 @@ export class AuthService {
     private authRepository: AuthRepository,
     private jwtService: JwtService,
     private prisma: PrismaService,
+    private configService: ConfigService,
   ) {}
 
 // 로그인
@@ -103,24 +105,29 @@ async login(loginDto: LoginDto): Promise<ResponseDto<any>> {
   // 이메일 인증 코드 전송
   private async sendVerificationCode(user_email: string): Promise<string> {
     const verificationCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+  
     this.verificationCodes.set(user_email, verificationCode);
-
+  
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: 'swuweb0320@gmail.com',
-        pass: 'wbsd ylod ahov hhat',
+        user: this.configService.get<string>('EMAIL_USER'),
+        pass: this.configService.get<string>('EMAIL_PASS'),
       },
     });
-
+  
     const mailOptions = {
-      from: 'swuweb0320@gmail.com',
+      from: this.configService.get<string>('EMAIL_USER'),
       to: user_email,
       subject: '요약러리 이메일 인증 코드',
       text: `요약러리의 인증 코드는 ${verificationCode} 입니다.`,
     };
-
-    await transporter.sendMail(mailOptions);
-    return verificationCode;
+  
+    try {
+      await transporter.sendMail(mailOptions);
+      return '인증 코드가 이메일로 전송되었습니다.';
+    } catch (error) {
+      throw new Error('이메일 전송 중 오류가 발생했습니다.');
+    }
   }
 }
