@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { AuthRepository } from './repositories/auth.repository';
 import { LoginDto } from './dto/login.dto';
-import { CreateUserDto, VerifyEmailDto } from './dto/user.dto';
+import { CreateUserDto, VerifyEmailDto, SendVerificationCodeDto } from './dto/user.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import * as nodemailer from 'nodemailer';
@@ -72,7 +72,7 @@ async login(loginDto: LoginDto): Promise<ResponseDto<any>> {
       throw new BadRequestException('이미 가입된 이메일 주소입니다.');
     }
 
-    const verificationCode = await this.sendVerificationCode(user_email);
+    const verificationCode = await this.sendVerificationCode({ user_email });
     const hashedPassword = await bcrypt.hash(user_pwd, 10);
 
     const user = await this.authRepository.createUser({
@@ -102,8 +102,9 @@ async login(loginDto: LoginDto): Promise<ResponseDto<any>> {
     return { message: '인증 성공' };
   }
 
-  // 이메일 인증 코드 전송
-  private async sendVerificationCode(user_email: string): Promise<string> {
+   // 이메일 인증 코드 전송
+   async sendVerificationCode(sendVerificationCodeDto: SendVerificationCodeDto): Promise<string> {
+    const { user_email } = sendVerificationCodeDto;
     const verificationCode = Math.random().toString(36).substring(2, 8).toUpperCase();
   
     this.verificationCodes.set(user_email, verificationCode);
@@ -119,8 +120,8 @@ async login(loginDto: LoginDto): Promise<ResponseDto<any>> {
     const mailOptions = {
       from: this.configService.get<string>('EMAIL_USER'),
       to: user_email,
-      subject: '요약러리 이메일 인증 코드',
-      text: `요약러리의 인증 코드는 ${verificationCode} 입니다.`,
+      subject: '이메일 인증 코드',
+      text: `인증 코드: ${verificationCode}`,
     };
   
     try {
