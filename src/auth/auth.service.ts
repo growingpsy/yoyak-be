@@ -1,12 +1,14 @@
 import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { AuthRepository } from './repositories/auth.repository';
 import { LoginDto } from './dto/login.dto';
-import { CreateUserDto, VerifyEmailDto } from './dto/user.dto';
+import { CreateUserDto, VerifyEmailDto, SendVerificationCodeDto } from './dto/user.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import * as nodemailer from 'nodemailer';
 import { PrismaService } from '../../prisma/prisma.service';
 import { KakaoUserDto } from './dto/kakao-user.dto';
+import { ResponseDto } from '../layer/dtos/response.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +18,7 @@ export class AuthService {
     private authRepository: AuthRepository,
     private jwtService: JwtService,
     private prisma: PrismaService,
+    private configService: ConfigService,
   ) {}
 
   // 로그인
@@ -61,7 +64,7 @@ export class AuthService {
       throw new BadRequestException('이미 가입된 이메일 주소입니다.');
     }
 
-    const verificationCode = await this.sendVerificationCode(user_email);
+    const verificationCode = await this.sendVerificationCode({ user_email });
     const hashedPassword = await bcrypt.hash(user_pwd, 10);
 
     const user = await this.authRepository.createUser({
@@ -102,28 +105,34 @@ export class AuthService {
     return { message: '이메일 인증 성공' };
   }
 
-  // 이메일 인증 코드 전송
-  private async sendVerificationCode(user_email: string): Promise<string> {
+   // 이메일 인증 코드 전송
+   async sendVerificationCode(sendVerificationCodeDto: SendVerificationCodeDto): Promise<string> {
+    const { user_email } = sendVerificationCodeDto;
     const verificationCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+  
     this.verificationCodes.set(user_email, verificationCode);
-
+  
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: 'swuweb0320@gmail.com',
-        pass: 'wbsd ylod ahov hhat',
+        user: this.configService.get<string>('EMAIL_USER'),
+        pass: this.configService.get<string>('EMAIL_PASS'),
       },
     });
-
+  
     const mailOptions = {
-      from: 'swuweb0320@gmail.com',
+      from: this.configService.get<string>('EMAIL_USER'),
       to: user_email,
-      subject: '요약러리 이메일 인증 코드',
-      text: `요약러리의 인증 코드는 ${verificationCode} 입니다.`,
+      subject: '이메일 인증 코드',
+      text: `인증 코드: ${verificationCode}`,
     };
-
-    await transporter.sendMail(mailOptions);
-    return verificationCode;
+  
+    try {
+      await transporter.sendMail(mailOptions);
+      return '인증 코드가 이메일로 전송되었습니다.';
+    } catch (error) {
+      throw new Error('이메일 전송 중 오류가 발생했습니다.');
+    }
   }
 
   // 카카오 로그인
