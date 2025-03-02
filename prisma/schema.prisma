@@ -45,6 +45,7 @@ model User {
   email_verified Boolean   @default(false)
   user_pwd       String    @db.VarChar(100)
   ban_count      Int       @default(0)
+  kakao_id       String?   @unique @db.VarChar(50)  // 카카오 로그인 전용 필드
   created_at     DateTime  @db.DateTime(0)
   updated_at     DateTime  @updatedAt @db.DateTime(0)
   library        library[]

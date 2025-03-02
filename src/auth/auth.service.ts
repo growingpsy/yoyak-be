@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import * as nodemailer from 'nodemailer';
 import { PrismaService } from '../../prisma/prisma.service';
+import { KakaoUserDto } from './dto/kakao-user.dto';
 import { ResponseDto } from '../layer/dtos/response.dto';
 import { ConfigService } from '@nestjs/config';
 
@@ -20,44 +21,36 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
-// 로그인
-async login(loginDto: LoginDto): Promise<ResponseDto<any>> {
-  console.log('[로그인 요청] Email:', loginDto.user_email);
-
-  try {
+  // 로그인
+  async login(loginDto: LoginDto) {
     const user = await this.prisma.user.findUnique({
       where: { user_email: loginDto.user_email },
     });
 
     if (!user) {
-      console.log('[로그인 실패] 존재하지 않는 이메일:', loginDto.user_email);
-      return new ResponseDto(404, '이메일이 존재하지 않습니다.', null);
+      throw new UnauthorizedException('이메일이 존재하지 않습니다.');
     }
 
     const isPasswordValid = await bcrypt.compare(loginDto.user_pwd, user.user_pwd);
     if (!isPasswordValid) {
-      console.log('[로그인 실패] 비밀번호 불일치:', loginDto.user_email);
-      return new ResponseDto(401, '비밀번호가 일치하지 않습니다.', null);
+      throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
     }
 
-    const payload = { sub: user.user_id, email: user.user_email };
-    const token = await this.jwtService.signAsync(payload);
+    const token = await this.jwtService.signAsync({
+      sub: user.user_id,
+      email: user.user_email,
+    });
 
-    console.log('[로그인 성공] 사용자 ID:', user.user_id);
-
-    return new ResponseDto(200, '로그인 성공', {
+    return {
+      accessToken: token,
       user_id: user.user_id,
       user_email: user.user_email,
       user_name: user.user_name,
       user_nick: user.user_nick,
       email_verified: user.email_verified,
-      access_token: token,
-    });
-  } catch (error) {
-    console.error('[로그인 오류]', error);
-    return new ResponseDto(500, '서버 오류가 발생했습니다.', null);
+    };
   }
-}
+
   // 회원가입
   async register(createUserDto: CreateUserDto) {
     const { user_name, user_nick, user_email, user_pwd, confirmPassword } = createUserDto;
@@ -67,7 +60,6 @@ async login(loginDto: LoginDto): Promise<ResponseDto<any>> {
     }
 
     const existingUser = await this.authRepository.findByEmail(user_email);
-
     if (existingUser) {
       throw new BadRequestException('이미 가입된 이메일 주소입니다.');
     }
@@ -83,9 +75,20 @@ async login(loginDto: LoginDto): Promise<ResponseDto<any>> {
       email_verified: false,
     });
 
-    console.log('생성된 user:', user);
-    console.log('user_id의 타입:', typeof user.user_id, '값:', user.user_id);
-    return { user, verificationCode };
+    const accessToken = await this.jwtService.signAsync({
+      sub: user.user_id,
+      email: user.user_email,
+    });
+
+    return {
+      user_id: user.user_id,
+      user_email: user.user_email,
+      user_name: user.user_name,
+      user_nick: user.user_nick,
+      email_verified: user.email_verified,
+      accessToken,
+      verificationCode,
+    };
   }
 
   // 이메일 인증
@@ -94,12 +97,12 @@ async login(loginDto: LoginDto): Promise<ResponseDto<any>> {
     const storedCode = this.verificationCodes.get(user_email);
 
     if (storedCode !== verification_code) {
-      throw new BadRequestException('인증 실패');
+      throw new BadRequestException('인증 코드가 일치하지 않습니다.');
     }
 
     await this.authRepository.updateEmailVerified(user_email);
 
-    return { message: '인증 성공' };
+    return { message: '이메일 인증 성공' };
   }
 
    // 이메일 인증 코드 전송
@@ -130,5 +133,41 @@ async login(loginDto: LoginDto): Promise<ResponseDto<any>> {
     } catch (error) {
       throw new Error('이메일 전송 중 오류가 발생했습니다.');
     }
+  }
+
+  // 카카오 로그인
+  async kakaoLogin(kakaoUser: KakaoUserDto) {
+    if (!kakaoUser.email) {
+      throw new BadRequestException('카카오 계정의 이메일 정보가 필요합니다.');
+    }
+
+    let user = await this.authRepository.findByEmail(kakaoUser.email);
+
+    if (!user) {
+      const randomPassword = Math.random().toString(36).slice(-8);
+      const hashedPassword = await bcrypt.hash(randomPassword, 10);
+
+      user = await this.authRepository.createUser({
+        user_email: kakaoUser.email,
+        user_name: kakaoUser.nickname,
+        user_nick: kakaoUser.nickname,
+        user_pwd: hashedPassword,
+        email_verified: true,
+        kakao_id: kakaoUser.kakaoId,
+      });
+    }
+
+    const accessToken = this.jwtService.sign({
+      email: user.user_email,
+      sub: user.user_id,
+    });
+
+    return {
+      accessToken,
+      user_id: user.user_id,
+      user_email: user.user_email,
+      user_name: user.user_name,
+      user_nick: user.user_nick,
+    };
   }
 }
