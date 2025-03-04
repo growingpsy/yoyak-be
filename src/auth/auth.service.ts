@@ -121,10 +121,10 @@ export class AuthService {
     });
   
     const mailOptions = {
-      from: this.configService.get<string>('EMAIL_USER'),
+      from: `요약러리 <${this.configService.get<string>('EMAIL_USER')}>`, // 보내는 사람 이름 설정
       to: user_email,
-      subject: '이메일 인증 코드',
-      text: `인증 코드: ${verificationCode}`,
+      subject: '요약러리 이메일 인증 코드',
+      html: `<p>요약러리의 이메일 인증 코드는 <strong style="font-size: 18px;">${verificationCode}</strong> 입니다.</p>`,
     };
   
     try {
