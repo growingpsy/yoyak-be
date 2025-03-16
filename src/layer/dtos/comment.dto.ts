@@ -26,12 +26,6 @@ export class DeleteCommentDto {
   comment_id!: number;
 }
 
-export class GetCommentDto {
-  @ApiProperty({ description: '댓글 ID', example: 1 })
-  @IsNumber()
-  comment_id!: number;
-}
-
 export class GetCommentsBySummaryDto {
   @ApiProperty({ description: 'Summary ID', example: 1 })
   @IsNumber()
