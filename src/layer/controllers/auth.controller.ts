@@ -1,9 +1,9 @@
 import { Controller, Post, Body, Get, UseGuards, Req } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { LoginDto } from './dto/login.dto';
+import { AuthService } from '../services/auth.service';
+import { LoginDto } from '../dtos/login.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { ResponseDto } from '../layer/dtos/response.dto';
-import { CreateUserDto, VerifyEmailDto, SendVerificationCodeDto } from './dto/user.dto';
+import { ResponseDto } from '../dtos/response.dto';
+import { CreateUserDto, VerifyEmailDto, SendVerificationCodeDto } from '../dtos/user.dto';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('auth')
