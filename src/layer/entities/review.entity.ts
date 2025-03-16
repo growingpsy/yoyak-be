@@ -1,5 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { Summary } from './summary.entity';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Content } from './content.entity';
 
 @Entity('review')
 export class Review {
@@ -12,7 +12,10 @@ export class Review {
   @CreateDateColumn()
   created_at!: Date;
 
-  @ManyToOne(() => Summary, (summary) => summary.reviews, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'summary_id' })
-  summary!: Summary;
+  @UpdateDateColumn()
+  updated_at!: Date;
+
+  @ManyToOne(() => Content, (content) => content.reviews, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'content_id' })
+  content!: Content;
 }
