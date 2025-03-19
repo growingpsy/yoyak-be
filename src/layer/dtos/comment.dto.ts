@@ -7,10 +7,10 @@ export class CreateCommentDto {
   @IsNotEmpty()
   comment_text!: string;
 
-  @ApiProperty({ description: '부모 댓글 ID', example: 0, required: false })
+  @ApiProperty({ description: '부모 댓글 ID (0이면 일반 댓글)', example: 0, required: false, default: 0 })
   @IsOptional()
   @IsNumber()
-  comment_parent_id?: number;
+  comment_parent_id?: number = 0;
 }
 
 export class UpdateCommentDto {
@@ -18,16 +18,4 @@ export class UpdateCommentDto {
   @IsString()
   @IsNotEmpty()
   comment_text!: string;
-}
-
-export class DeleteCommentDto {
-  @ApiProperty({ description: '댓글 ID', example: 1 })
-  @IsNumber()
-  comment_id!: number;
-}
-
-export class GetCommentsBySummaryDto {
-  @ApiProperty({ description: 'Summary ID', example: 1 })
-  @IsNumber()
-  summary_id!: number;
 }
