@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+import { Review } from './review.entity';
 
 export enum ContentType {
   BOOK = 'book',
@@ -12,17 +13,20 @@ export class Content {
   content_id!: number;
 
   @Column({ type: 'varchar', length: 255 })
-  content_title!: string; 
+  content_title!: string;
 
   @Column({ type: 'enum', enum: ContentType })
-  content_type!: ContentType; 
+  content_type!: ContentType;
 
   @Column({ type: 'varchar', length: 255 })
-  content_genre!: string; 
+  content_genre!: string;
 
   @Column({ type: 'text' })
-  content_plot!: string; 
+  content_plot!: string;
 
-  @Column({ type: 'datetime' })
-  created_at!: Date; 
+  @CreateDateColumn()
+  created_at!: Date;
+
+  @OneToMany(() => Review, (review) => review.content, { cascade: true })
+  reviews!: Review[];
 }
