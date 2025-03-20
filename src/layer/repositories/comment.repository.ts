@@ -7,20 +7,17 @@ export class CommentRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   // 댓글 생성
-  async createComment(dto: CreateCommentDto & { summary_id: number, user_id: number }) {
-    return this.prisma.comment.create({
-      data: {
-        comment_text: dto.comment_text,
-        comment_parent_id: dto.comment_parent_id || 0,
-        user: {
-          connect: { user_id: dto.user_id }, 
-        },
-        summary: {
-          connect: { summary_id: dto.summary_id }, 
-        },
-      },
-    });
-  }
+// 댓글 생성
+async createComment(dto: CreateCommentDto & { summary_id: number, user_id: number }) {
+  return this.prisma.comment.create({
+    data: {
+      comment_text: dto.comment_text,
+      comment_parent_id: dto.comment_parent_id || null,
+      summary_id: dto.summary_id,
+      user_id: dto.user_id,
+    },
+  });
+}
 
   // 댓글 조회
   async findCommentById(commentId: number) {
