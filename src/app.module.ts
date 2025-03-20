@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
+import { AuthModule } from './layer/modules/auth.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { ContentController } from 'layer/controllers/content.controller';
@@ -10,6 +10,7 @@ import { ReviewService } from './layer/services/review.service';
 import { ReviewController } from './layer/controllers/review.controller';
 import { ReviewModule } from './layer/modules/review.module';
 import { ReviewRepository } from './layer/repositories/review.repository';
+import { CommentModule } from './layer/modules/comment.module';
 
 @Module({
   imports: [
@@ -17,8 +18,9 @@ import { ReviewRepository } from './layer/repositories/review.repository';
       isGlobal: true,
     }),
     PrismaModule,
-    AuthModule, 
+    AuthModule,
     ReviewModule,
+    CommentModule,
   ],
   controllers: [AppController, ContentController, ReviewController],
   providers: [AppService, ContentService, ReviewService, ReviewRepository],
