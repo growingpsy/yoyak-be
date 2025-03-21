@@ -15,6 +15,7 @@ export class CreateContentDto {
     content_genre!: string;
     content_plot!: string;
     created_at!: Date;
+    review_id!: number;
   }
   /* 스웨거에서 자동으로 스키마 인식하도록 하려면 필요하다고 합니다.
 

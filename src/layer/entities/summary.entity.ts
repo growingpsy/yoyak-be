@@ -3,7 +3,6 @@ import { Content } from './content.entity';
 import { User } from './user.entity';  
 import { Highlight } from './highlight.entity';
 import { LikeDislike } from './likeDislike.entity';
-import { Review } from './review.entity';
 import { Comment } from './comment.entity';
 
 @Entity('summary')
@@ -45,9 +44,6 @@ export class Summary {
 
   @OneToMany(() => LikeDislike, (likeDislike) => likeDislike.summary, { cascade: true })
 likeDislikes!: LikeDislike[];
-
-@OneToMany(() => Review, (review) => review.summary)
-reviews!: Review[];
 
 @OneToMany(() => Comment, (comment) => comment.summary)
 comments!: Comment[];

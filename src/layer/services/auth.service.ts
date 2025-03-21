@@ -1,13 +1,12 @@
 import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
-import { AuthRepository } from './repositories/auth.repository';
-import { LoginDto } from './dto/login.dto';
-import { CreateUserDto, VerifyEmailDto, SendVerificationCodeDto } from './dto/user.dto';
+import { AuthRepository } from '../repositories/auth.repository';
+import { LoginDto } from '../dtos/login.dto';
+import { CreateUserDto, VerifyEmailDto, SendVerificationCodeDto } from '../dtos/user.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import * as nodemailer from 'nodemailer';
-import { PrismaService } from '../../prisma/prisma.service';
-import { KakaoUserDto } from './dto/kakao-user.dto';
-import { ResponseDto } from '../layer/dtos/response.dto';
+import { PrismaService } from '../../../prisma/prisma.service';
+import { KakaoUserDto } from '../dtos/kakao-user.dto';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -37,7 +36,7 @@ export class AuthService {
     }
 
     const token = await this.jwtService.signAsync({
-      sub: user.user_id,
+      user_id: user.user_id,
       email: user.user_email,
     });
 
@@ -76,7 +75,7 @@ export class AuthService {
     });
 
     const accessToken = await this.jwtService.signAsync({
-      sub: user.user_id,
+      user_id: user.user_id,
       email: user.user_email,
     });
 
@@ -105,13 +104,13 @@ export class AuthService {
     return { message: '이메일 인증 성공' };
   }
 
-   // 이메일 인증 코드 전송
-   async sendVerificationCode(sendVerificationCodeDto: SendVerificationCodeDto): Promise<string> {
+  // 이메일 인증 코드 전송
+  async sendVerificationCode(sendVerificationCodeDto: SendVerificationCodeDto): Promise<string> {
     const { user_email } = sendVerificationCodeDto;
     const verificationCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-  
+
     this.verificationCodes.set(user_email, verificationCode);
-  
+
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -119,14 +118,14 @@ export class AuthService {
         pass: this.configService.get<string>('EMAIL_PASS'),
       },
     });
-  
+
     const mailOptions = {
-      from: this.configService.get<string>('EMAIL_USER'),
+      from: `요약러리 <${this.configService.get<string>('EMAIL_USER')}>`, // 보내는 사람 이름 설정
       to: user_email,
-      subject: '이메일 인증 코드',
-      text: `인증 코드: ${verificationCode}`,
+      subject: '요약러리 이메일 인증 코드',
+      html: `<p>요약러리의 이메일 인증 코드는 <strong style="font-size: 18px;">${verificationCode}</strong> 입니다.</p>`,
     };
-  
+
     try {
       await transporter.sendMail(mailOptions);
       return '인증 코드가 이메일로 전송되었습니다.';
@@ -158,8 +157,8 @@ export class AuthService {
     }
 
     const accessToken = this.jwtService.sign({
+      user_id: user.user_id,
       email: user.user_email,
-      sub: user.user_id,
     });
 
     return {
