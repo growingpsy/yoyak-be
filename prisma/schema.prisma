@@ -19,6 +19,8 @@ model Bookmark {
 
 model Summary {
   summary_id       Int           @id @default(autoincrement())
+  summary_title    String        @db.Text
+  summary_episode  Int         
   summary_text     String        @db.Text
   is_long          Boolean       @default(false)
   contains_spoiler Boolean       @default(false)
