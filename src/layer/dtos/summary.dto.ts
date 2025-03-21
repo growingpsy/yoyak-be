@@ -1,18 +1,81 @@
+import { IsString, IsBoolean, IsNumber, IsOptional } from 'class-validator';
+
+
 export class CreateSummaryDto {
-  readonly summary_text!: string; 
-  readonly is_long!: boolean;
-  readonly contains_spoiler!: boolean;
-  readonly content_id!: number;
-  readonly user_id!: number;
+  @IsString()
+  summary_text!: string;
+
+  @IsString()
+  summary_title!: string;
+
+  @IsNumber()
+  summary_episode!: number;
+
+  @IsBoolean()
+  is_long!: boolean;
+
+  @IsBoolean()
+  contains_spoiler!: boolean;
+
+  @IsNumber()
+  content_id!: number;
+
+  @IsNumber()
+  user_id!: number;
 }
 
+
 export class SummaryResponseDto {
+  @IsNumber()
   summary_id!: number;
+
+  @IsString()
   summary_text!: string;
+
+  @IsBoolean()
   is_long!: boolean;
+
+  @IsBoolean()
   contains_spoiler!: boolean;
-  created_at!: Date;
-  updated_at!: Date;
+
+  @IsNumber()
   content_id!: number;
+
+  @IsNumber()
+  user_id!: number;
+
+  @IsString()
+  created_at!: Date;
+
+  @IsString()
+  updated_at!: Date;
+}
+
+
+export class UpdateSummaryDto {
+  @IsString()
+  summaryId!: string;
+
+  @IsString()
+  summary_title!: string;
+
+  @IsNumber()
+  summary_episode!: number;
+
+  @IsString()
+  summary_text!: string;
+
+  @IsBoolean()
+  @IsOptional()
+  is_long?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  contains_spoiler?: boolean;
+
+  @IsNumber()
+  content_id!: number;
+
+  @IsNumber()
   user_id!: number;
 }

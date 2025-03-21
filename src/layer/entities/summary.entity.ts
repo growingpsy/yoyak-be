@@ -14,6 +14,12 @@ export class Summary {
   @Column({ type: 'text' })
   summary_text!: string;  
 
+  @Column({ type: 'varchar', length: 255 })  
+  summary_title!: string;
+
+  @Column({ type: 'int', default: 1 }) 
+  summary_episode!: number;
+
   @Column({ type: 'tinyint', width: 1 })
   is_long!: boolean;  
 

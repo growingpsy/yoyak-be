@@ -6,6 +6,8 @@ export class SummaryModel {
   // 새로운 요약 생성
   async createSummary(data: {
     summary_text: string;
+    summary_title: '제목', 
+    summary_episode: 1, 
     is_long: boolean;
     contains_spoiler: boolean;
     content_id: number;
@@ -14,6 +16,8 @@ export class SummaryModel {
     return prisma.summary.create({
       data: {
         summary_text: data.summary_text,
+        summary_title: data.summary_title,
+        summary_episode: data.summary_episode,
         is_long: data.is_long,
         contains_spoiler: data.contains_spoiler,
         content_id: data.content_id,
