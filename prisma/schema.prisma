@@ -30,7 +30,7 @@ model Summary {
   user_id          Int
   bookmark         Bookmark[]
   comment          comment[]
-  highlight        highlight[]
+  highlight        Highlight[]
   likeDislike      likeDislike[]
 
   @@index([content_id], map: "content_id_idx")
@@ -91,14 +91,18 @@ model content {
 
 }
 
-model highlight {
+model Highlight {
   highlight_id   Int      @id @default(autoincrement())
   highlight_text String   @db.Text
   created_at     DateTime @default(now()) @db.DateTime(0)
   summary_id     Int
   summary        Summary  @relation(fields: [summary_id], references: [summary_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_highlight_summary_id")
 
+  review_id      Int?     
+  review         review?  @relation(fields: [review_id], references: [review_id], onDelete: SetNull, onUpdate: NoAction, map: "fk_highlight_review_id")  // review와 연결
+
   @@index([summary_id], map: "fk_summary_id_idx")
+  @@index([review_id], map: "fk_review_id_idx")  
 }
 
 model library {
@@ -126,7 +130,8 @@ model review {
   created_at  DateTime @default(now()) @db.DateTime(0)
   updated_at  DateTime @default(now()) @updatedAt @db.DateTime(0)
   content_id  Int
-  content     content  @relation(fields: [content_id], references: [content_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_review_content_id")
+  content     content  @relation(fields: [content_id], references: [content_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_review_content_id")  
+  highlight   Highlight[]
 }
 
 enum content_content_type {

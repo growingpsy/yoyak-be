@@ -11,6 +11,7 @@ import { ReviewController } from './layer/controllers/review.controller';
 import { ReviewModule } from './layer/modules/review.module';
 import { ReviewRepository } from './layer/repositories/review.repository';
 import { CommentModule } from './layer/modules/comment.module';
+import { HighlightRepository } from './layer/repositories/highlight.repository';
 
 @Module({
   imports: [
@@ -23,6 +24,6 @@ import { CommentModule } from './layer/modules/comment.module';
     CommentModule,
   ],
   controllers: [AppController, ContentController, ReviewController],
-  providers: [AppService, ContentService, ReviewService, ReviewRepository],
+  providers: [AppService, ContentService, ReviewService, ReviewRepository, HighlightRepository],
 })
 export class AppModule {}
