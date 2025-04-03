@@ -52,18 +52,24 @@ export class AuthService {
 
   // 회원가입
   async register(createUserDto: CreateUserDto) {
-    const { user_name, user_nick, user_email, user_pwd, confirmPassword } = createUserDto;
+    const { user_name, user_nick, user_email, user_pwd, confirmPassword, verificationCode } = createUserDto;
 
     if (user_pwd !== confirmPassword) {
       throw new BadRequestException('비밀번호가 일치하지 않습니다.');
     }
+
+    const storedVerificationCode = this.verificationCodes.get(user_email); // 이메일로 전송된 인증 코드 조회
+    if (verificationCode !== storedVerificationCode) {
+      throw new BadRequestException('인증번호가 일치하지 않습니다.');
+    }
+
+    const email_verified = true;
 
     const existingUser = await this.authRepository.findByEmail(user_email);
     if (existingUser) {
       throw new BadRequestException('이미 가입된 이메일 주소입니다.');
     }
 
-    const verificationCode = await this.sendVerificationCode({ user_email });
     const hashedPassword = await bcrypt.hash(user_pwd, 10);
 
     const user = await this.authRepository.createUser({
@@ -71,7 +77,7 @@ export class AuthService {
       user_nick,
       user_email,
       user_pwd: hashedPassword,
-      email_verified: false,
+      email_verified,
     });
 
     const accessToken = await this.jwtService.signAsync({
@@ -86,22 +92,7 @@ export class AuthService {
       user_nick: user.user_nick,
       email_verified: user.email_verified,
       accessToken,
-      verificationCode,
     };
-  }
-
-  // 이메일 인증
-  async verifyEmail(verifyEmailDto: VerifyEmailDto) {
-    const { user_email, verification_code } = verifyEmailDto;
-    const storedCode = this.verificationCodes.get(user_email);
-
-    if (storedCode !== verification_code) {
-      throw new BadRequestException('인증 코드가 일치하지 않습니다.');
-    }
-
-    await this.authRepository.updateEmailVerified(user_email);
-
-    return { message: '이메일 인증 성공' };
   }
 
   // 이메일 인증 코드 전송

@@ -36,15 +36,6 @@ export class AuthController {
     return this.authService.sendVerificationCode(sendVerificationCodeDto);
   }
 
-  @Post('verify-email')
-  @ApiOperation({ summary: '이메일 인증', description: '사용자가 받은 인증 코드를 입력하여 이메일을 인증합니다.' })
-  @ApiResponse({ status: 200, description: '이메일 인증 성공' })
-  @ApiResponse({ status: 400, description: '인증 코드 불일치' })
-  async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
-    const result = await this.authService.verifyEmail(verifyEmailDto);
-    return new ResponseDto(200, '이메일 인증 성공', result);
-  }
-
   @Get('kakao')
   @ApiOperation({ summary: '카카오 로그인', description: '카카오 로그인 페이지로 리다이렉트합니다.' })
   @ApiResponse({ status: 200, description: '카카오 로그인 페이지로 이동합니다.' })
