@@ -2,14 +2,15 @@ import { Controller, Post, Delete, Get, Param, Body, ParseIntPipe } from '@nestj
 import { HighlightService } from '../services/highlight.service';
 import { CreateHighlightDto } from '../dtos/highlight.dto';
 import { ResponseDto } from '../dtos/response.dto';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
+@ApiTags('Highlight')
 @Controller('highlights')
 export class HighlightController {
   constructor(private readonly highlightService: HighlightService) {}
 
   @Post('summary/:summary_id')
-  @ApiOperation({ summary: '요약문 하이라이트 저장', description: '특정 요약문에 하이라이트를 저장합니다.' })
+  @ApiOperation({ summary: '요약문 하이라이트 저장', description: '특정 요약문의 하이라이트를 저장합니다.' })
   @ApiResponse({ status: 201, description: '하이라이트 저장 성공' })
   @ApiResponse({ status: 400, description: '잘못된 요청' })
   async highlightSummary(@Param('summary_id', ParseIntPipe) summary_id: number, @Body() createHighlightDto: CreateHighlightDto) {
@@ -18,7 +19,7 @@ export class HighlightController {
   }
 
   @Post('review/:review_id')
-  @ApiOperation({ summary: '리뷰 하이라이트 저장', description: '특정 리뷰에 하이라이트를 저장합니다.' })
+  @ApiOperation({ summary: '리뷰 하이라이트 저장', description: '특정 리뷰의 하이라이트를 저장합니다.' })
   @ApiResponse({ status: 201, description: '하이라이트 저장 성공' })
   @ApiResponse({ status: 400, description: '잘못된 요청' })
   async highlightReview(@Param('review_id', ParseIntPipe) review_id: number, @Body() createHighlightDto: CreateHighlightDto) {

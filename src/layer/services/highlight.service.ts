@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { HighlightRepository } from '../repositories/highlight.repository';
+import { HighlightRepository } from '../repositories/highlight.repository';  // Prisma 방식으로 수정된 저장소 사용
 import { CreateHighlightDto } from '../dtos/highlight.dto';
 import { SummaryRepository } from '../repositories/summary.repository';
 import { ReviewRepository } from '../repositories/review.repository';
@@ -7,7 +7,7 @@ import { ReviewRepository } from '../repositories/review.repository';
 @Injectable()
 export class HighlightService {
   constructor(
-    private readonly highlightRepository: HighlightRepository,
+    private readonly highlightRepository: HighlightRepository,  // PrismaService로 변경된 Repository
     private readonly summaryRepository: SummaryRepository,
     private readonly reviewRepository: ReviewRepository,
   ) {}
@@ -20,8 +20,8 @@ export class HighlightService {
       throw new Error('요약문이 존재하지 않습니다.');
     }
 
-    // 하이라이트 저장
-    const highlight = await this.highlightRepository.save({
+    // 하이라이트 저장 (Prisma 방식으로 수정)
+    const highlight = await this.highlightRepository.saveHighlight({
       ...createHighlightDto,
       summary_id,
     });
@@ -37,8 +37,8 @@ export class HighlightService {
       throw new Error('리뷰가 존재하지 않습니다.');
     }
 
-    // 하이라이트 저장
-    const highlight = await this.highlightRepository.save({
+    // 하이라이트 저장 
+    const highlight = await this.highlightRepository.saveHighlight({
       ...createHighlightDto,
       review_id,
     });
@@ -54,8 +54,8 @@ export class HighlightService {
       throw new Error('요약문이 존재하지 않습니다.');
     }
 
-    // 요약문 하이라이트 삭제
-    await this.highlightRepository.delete({ summary_id });
+    // 요약문 하이라이트 삭제 (Prisma 방식으로 수정)
+    await this.highlightRepository.deleteHighlightBySummary(summary_id);
   }
 
   // 리뷰 하이라이트 취소
@@ -66,21 +66,17 @@ export class HighlightService {
       throw new Error('리뷰가 존재하지 않습니다.');
     }
 
-    // 리뷰 하이라이트 삭제
-    await this.highlightRepository.delete({ review_id });
+    // 리뷰 하이라이트 삭제 (Prisma 방식으로 수정)
+    await this.highlightRepository.deleteHighlightByReview(review_id);
   }
 
   // 하이라이트 전체 조회
   async getAllHighlights() {
-    return await this.highlightRepository.find();
+    return await this.highlightRepository.findAllHighlights();
   }
 
   // 하이라이트 작성일 순 조회
   async getHighlightsByDate() {
-    return await this.highlightRepository.find({
-      order: {
-        created_at: 'ASC', // 작성일 순으로 조회
-      },
-    });
+    return await this.highlightRepository.findHighlightsByDate();
   }
 }

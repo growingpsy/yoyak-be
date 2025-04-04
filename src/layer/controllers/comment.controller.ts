@@ -15,7 +15,7 @@ import {
   import { AuthGuard } from '@nestjs/passport';
   import { ResponseDto } from '../dtos/response.dto';
   
-  @ApiTags('comments')
+  @ApiTags('Comments')
   @ApiBearerAuth('access-token')
   @Controller('summaries/:summary_id/comments')
   export class CommentController {
