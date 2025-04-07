@@ -11,6 +11,7 @@ import { ReviewController } from './layer/controllers/review.controller';
 import { ReviewModule } from './layer/modules/review.module';
 import { ReviewRepository } from './layer/repositories/review.repository';
 import { CommentModule } from './layer/modules/comment.module';
+import { BookmarkModule } from './layer/modules/bookmark.module';
 import { SummaryModule } from './layer/modules/summary.module';
 import { HighlightModule } from './layer/modules/highlight.module';
 
@@ -23,6 +24,7 @@ import { HighlightModule } from './layer/modules/highlight.module';
     AuthModule,
     ReviewModule,
     CommentModule,
+    BookmarkModule
     SummaryModule,
     HighlightModule,
   ],

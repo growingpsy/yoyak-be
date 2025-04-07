@@ -1,11 +1,12 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsNumber } from 'class-validator';
+
 export class CreateBookmarkDto {
-    readonly created_at!: Date;  
-    readonly summary_id!: number;
-  }
-  
-  export class BookmarkResponseDto {
-    bookmark_id!: number;  
-    created_at!: Date;  
-    summary_id!: number;  
-  }
-  
+  @ApiProperty({
+    description: '북마크할 요약문 ID',
+    example: 42,
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  summary_id!: number;
+}
