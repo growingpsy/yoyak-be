@@ -1,14 +1,9 @@
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
 import { SummaryService } from '../services/summary.service';
-import { CreateSummaryDto,UpdateSummaryDto } from '../dtos/summary.dto';
-
+import { CreateSummaryDto, UpdateSummaryDto} from '../dtos/summary.dto';
 import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
-import { SummaryService } from './summary.service';
-import { CreateSummaryDto } from './dto/create-summary.dto';
-import { UpdateSummaryDto } from './dto/update-summary.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
-@ApiTags('summary') // ✅ Swagger에서 `summary` 그룹으로 표시
+@ApiTags('Summary') // ✅ Swagger에서 `summary` 그룹으로 표시
 @Controller('summary')
 export class SummaryController {
   constructor(private readonly summaryService: SummaryService) {}

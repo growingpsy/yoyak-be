@@ -21,22 +21,23 @@ export class CreateUserDto {
   @IsBoolean()
   readonly email_verified?: boolean = false;
 
-  @ApiProperty({ description: '사용자 비밀번호', example: 'password123', minLength: 6 })
+  @ApiProperty({ description: '이메일 인증 코드', example: 'ABC123' })
+  @IsString()
+  @IsNotEmpty()
+  readonly verificationCode!: string;
+
+  @ApiProperty({ description: '사용자 비밀번호', example: 'password123!', minLength: 6 })
   @IsString()
   @MinLength(6, { message: '비밀번호는 최소 6자 이상이어야 합니다.' })
+  @Matches(/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*]).{6,}$/, { message: '비밀번호는 최소 6자 이상이어야 하며, 알파벳, 숫자, 특수문자를 포함해야 합니다.' })
   readonly user_pwd!: string;
 
   @ApiProperty({ description: '비밀번호 확인', example: 'password123' })
   @IsString()
   @IsNotEmpty()
-  @ValidateIf((o) => o.user_pwd)
-  @Matches(/^[a-zA-Z0-9!@#$%^&*]{6,}$/, { message: '비밀번호 확인은 비밀번호와 일치해야 합니다.' })
+  @ValidateIf((o) => o.user_pwd) // user_pwd가 있을 때만 확인
+  @Matches(/^(?=.*[a-zA-Z0-9!@#$%^&*]).{6,}$/, { message: '비밀번호 확인은 비밀번호와 일치해야 합니다.' })
   readonly confirmPassword!: string;
-
-  @ApiProperty({ description: '비밀번호와 비밀번호 확인이 일치하는지 확인' })
-  @ValidateIf((o) => o.user_pwd && o.confirmPassword)
-  @Matches(/^(?=.*[a-zA-Z0-9!@#$%^&*]).{6,}$/, { message: '비밀번호와 비밀번호 확인이 일치해야 합니다.' })
-  readonly confirmPasswordCheck?: boolean;
 }
 
 export class UpdateUserDto {
@@ -57,6 +58,11 @@ export class UpdateUserDto {
   @ApiProperty({ description: '이메일 인증 여부', example: false, required: false })
   @IsBoolean()
   readonly email_verified?: boolean;
+
+  @ApiProperty({ description: '이메일 인증 코드', example: '123456' })
+  @IsString()
+  @IsNotEmpty({ message: '인증 코드를 입력해주세요.' })
+  readonly verificationCode?: string;
 
   @ApiProperty({ description: '사용자 비밀번호', example: 'password123', required: false })
   @IsString()

@@ -1,6 +1,7 @@
 export class CreateHighlightDto {
     readonly highlight_text!: string;
     readonly summary_id!: number;
+    readonly review_id!: number;
   }
   
   export class HighlightResponseDto {
