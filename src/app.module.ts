@@ -24,7 +24,7 @@ import { HighlightModule } from './layer/modules/highlight.module';
     AuthModule,
     ReviewModule,
     CommentModule,
-    BookmarkModule
+    BookmarkModule,
     SummaryModule,
     HighlightModule,
   ],
