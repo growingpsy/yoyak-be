@@ -23,7 +23,9 @@ export class HighlightRepository {
   // 하이라이트 삭제 (review_id로 삭제)
   async deleteHighlightByReview(review_id: number) {
     return this.prisma.highlight.deleteMany({
-      where: { review_id }, 
+      where: { 
+        review_id: review_id
+      } as any, 
     });
   }
 
