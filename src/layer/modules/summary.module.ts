@@ -7,5 +7,6 @@ import { PrismaService } from '../../../prisma/prisma.service';
 @Module({
   controllers: [SummaryController],
   providers: [SummaryService, SummaryRepository, PrismaService],
+  exports: [SummaryRepository],
 })
 export class SummaryModule {}
