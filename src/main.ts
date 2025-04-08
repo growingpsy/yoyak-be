@@ -44,7 +44,7 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('yoyaklary', app, document);
+  SwaggerModule.setup('swagger', app, document);
 
   const domain = process.env.APP_DOMAIN || 'http://localhost';
   const port = Number(process.env.PORT) || 3000;
