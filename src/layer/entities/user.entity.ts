@@ -31,5 +31,5 @@ export class User {
   updated_at!: Date;
 
   @OneToMany(() => Library, (library) => library.user, { cascade: true })
-libraries!: Library[];
+  libraries!: Library[];
 }

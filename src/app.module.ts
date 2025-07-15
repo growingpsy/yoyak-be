@@ -14,6 +14,7 @@ import { CommentModule } from './layer/modules/comment.module';
 import { BookmarkModule } from './layer/modules/bookmark.module';
 import { SummaryModule } from './layer/modules/summary.module';
 import { HighlightModule } from './layer/modules/highlight.module';
+import { OnboardingModule } from './layer/modules/onboarding.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { HighlightModule } from './layer/modules/highlight.module';
     BookmarkModule,
     SummaryModule,
     HighlightModule,
+    OnboardingModule,
   ],
   controllers: [AppController, ContentController, ReviewController],
   providers: [AppService, ContentService, ReviewService, ReviewRepository],
