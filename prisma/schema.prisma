@@ -1,0 +1,165 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Bookmark {
+  bookmark_id Int      @id @default(autoincrement())
+  created_at  DateTime @default(now()) @db.DateTime(0)
+  summary_id  Int
+  user_id     Int  
+  summary     Summary @relation(fields: [summary_id], references: [summary_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_bookmark_summary")
+  user        User     @relation(fields: [user_id], references: [user_id])
+  
+  @@index([summary_id], map: "summary_id_idx")
+  @@index([user_id])
+  @@map("bookmark")
+}
+
+model Summary {
+  summary_id       Int           @id @default(autoincrement())
+  summary_title    String        @db.Text @default("")
+  summary_episode  Int           @default(1)
+  summary_text     String        @db.Text
+  is_long          Boolean       @default(false)
+  contains_spoiler Boolean       @default(false)
+  created_at       DateTime      @default(now()) @db.DateTime(0)
+  updated_at       DateTime      @default(now()) @updatedAt @db.DateTime(0)
+  content_id       Int
+  user_id          Int
+  content          content       @relation(fields: [content_id], references: [content_id], onDelete: Cascade, onUpdate: NoAction)
+  bookmark         Bookmark[]
+  comment          comment[]
+  highlight        Highlight[]
+  likeDislike      likeDislike[]
+
+  @@index([content_id], map: "content_id_idx")
+  @@index([user_id], map: "user_id_idx")
+  @@map("summary")
+}
+
+model User {
+  user_id        Int       @id @default(autoincrement())
+  user_name      String    @db.VarChar(50)
+  user_nick      String    @db.VarChar(50)
+  user_email     String    @unique(map: "user_email") @db.VarChar(255)
+  email_verified Boolean   @default(false)
+  user_pwd       String    @db.VarChar(100)
+  ban_count      Int       @default(0)
+  kakao_id       String?   @unique @db.VarChar(50)  // 카카오 로그인 전용 필드
+  created_at     DateTime  @db.DateTime(0)
+  updated_at     DateTime  @updatedAt @db.DateTime(0)
+  library        library[]
+  comments       comment[]
+  bookmarks      Bookmark[]
+  onboarding     Onboarding?
+
+  @@map("user")
+}
+
+model Onboarding {
+  onboarding_id      Int      @id @default(autoincrement())
+  user_id            Int      @unique
+  content_types      Json     // ["book", "movie", "drama"]
+  preferred_genres   Json     // ["액션", "로맨스", "스릴러"]
+  onboarding_completed Boolean @default(false)
+  created_at         DateTime @default(now()) @db.DateTime(0)
+  updated_at         DateTime @default(now()) @updatedAt @db.DateTime(0)
+  user               User     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("onboarding")
+}
+
+model SequelizeMeta {
+  name String @id @unique(map: "name") @db.VarChar(255)
+}
+
+model comment {
+  comment_id        Int      @id @default(autoincrement())
+  comment_parent_id Int?     
+  comment_text      String   @db.Text
+  created_at        DateTime @default(now()) @db.DateTime(0)
+  updated_at        DateTime @default(now()) @db.DateTime(0)
+  summary_id        Int
+  user_id           Int      @map("user_id")
+
+  summary           Summary  @relation(fields: [summary_id], references: [summary_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_comment_summary")
+  user              User     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
+
+  // 대댓글을 위한 자기 참조 관계
+  parent            comment?  @relation("CommentReplies", fields: [comment_parent_id], references: [comment_id], onDelete: SetNull) 
+  replies           comment[] @relation("CommentReplies")
+
+  @@index([summary_id], map: "fk_comment_summary")
+  @@index([user_id], map: "fk_comment_user")
+  @@index([comment_parent_id]) 
+}
+
+model content {
+  content_id    Int                  @id @default(autoincrement())
+  content_title String               @db.VarChar(255)
+  content_type  content_content_type
+  content_genre String               @db.VarChar(255)
+  content_plot  String               @db.Text
+  created_at    DateTime             @default(now()) @db.DateTime(0)
+  review        review[]
+  summary       Summary[]
+  highlight     Highlight[]
+}
+
+model Highlight {
+  highlight_id   Int      @id @default(autoincrement())
+  highlight_text String   @db.Text
+  created_at     DateTime @default(now()) @db.DateTime(0)
+  summary_id     Int
+  summary        Summary  @relation(fields: [summary_id], references: [summary_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_highlight_summary_id")
+
+  review_id      Int?     
+  review         review?  @relation(fields: [review_id], references: [review_id], onDelete: SetNull, onUpdate: NoAction, map: "fk_highlight_review_id")  // review와 연결
+
+  content_id     Int
+  content        content  @relation(fields: [content_id], references: [content_id])
+
+  @@index([summary_id], map: "fk_summary_id_idx")
+  @@index([review_id], map: "fk_review_id_idx")  
+  @@index([content_id])
+}
+
+model library {
+  library_id Int  @id @default(autoincrement())
+  user_id    Int
+  user       User @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "library_ibfk_1")
+
+  @@index([user_id], map: "library_ibfk_1")
+}
+
+model likeDislike {
+  like_id    Int
+  dislike_id Int
+  created_at DateTime @default(now()) @db.DateTime(0)
+  summary_id Int
+  summary    Summary  @relation(fields: [summary_id], references: [summary_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_like_summary_id")
+
+  @@id([like_id, dislike_id])
+  @@index([summary_id], map: "fk_like_summary_id_idx")
+}
+
+model review {
+  review_id   Int      @id @default(autoincrement())
+  review_text String   @db.VarChar(255)
+  created_at  DateTime @default(now()) @db.DateTime(0)
+  updated_at  DateTime @default(now()) @updatedAt @db.DateTime(0)
+  content_id  Int
+  content     content  @relation(fields: [content_id], references: [content_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_review_content_id")  
+  highlight   Highlight[]
+}
+
+enum content_content_type {
+  book
+  drama
+  movie
+}
