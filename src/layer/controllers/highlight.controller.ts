@@ -44,7 +44,7 @@ export class HighlightController {
   }
 
   @Get()
-  @ApiOperation({ summary: '하이라이트 전체 조회', description: '모든 하이라이트를 조회합니다.' })
+  @ApiOperation({ summary: '하이라이트 전체 조회(컨텐츠 제목순)', description: '모든 하이라이트를 컨텐츠 제목순으로 조회합니다.' })
   @ApiResponse({ status: 200, description: '하이라이트 조회 성공' })
   async getAllHighlights() {
     const result = await this.highlightService.getAllHighlights();

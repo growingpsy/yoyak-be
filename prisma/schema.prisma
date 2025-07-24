@@ -22,8 +22,8 @@ model Bookmark {
 
 model Summary {
   summary_id       Int           @id @default(autoincrement())
-  summary_title    String        @db.Text
-  summary_episode  Int         
+  summary_title    String        @db.Text @default("")
+  summary_episode  Int           @default(1)
   summary_text     String        @db.Text
   is_long          Boolean       @default(false)
   contains_spoiler Boolean       @default(false)
@@ -31,6 +31,7 @@ model Summary {
   updated_at       DateTime      @default(now()) @updatedAt @db.DateTime(0)
   content_id       Int
   user_id          Int
+  content          content       @relation(fields: [content_id], references: [content_id], onDelete: Cascade, onUpdate: NoAction)
   bookmark         Bookmark[]
   comment          comment[]
   highlight        Highlight[]
@@ -55,8 +56,22 @@ model User {
   library        library[]
   comments       comment[]
   bookmarks      Bookmark[]
+  onboarding     Onboarding?
 
   @@map("user")
+}
+
+model Onboarding {
+  onboarding_id      Int      @id @default(autoincrement())
+  user_id            Int      @unique
+  content_types      Json     // ["book", "movie", "drama"]
+  preferred_genres   Json     // ["액션", "로맨스", "스릴러"]
+  onboarding_completed Boolean @default(false)
+  created_at         DateTime @default(now()) @db.DateTime(0)
+  updated_at         DateTime @default(now()) @updatedAt @db.DateTime(0)
+  user               User     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("onboarding")
 }
 
 model SequelizeMeta {
@@ -92,7 +107,8 @@ model content {
   content_plot  String               @db.Text
   created_at    DateTime             @default(now()) @db.DateTime(0)
   review        review[]
-
+  summary       Summary[]
+  highlight     Highlight[]
 }
 
 model Highlight {
@@ -105,8 +121,12 @@ model Highlight {
   review_id      Int?     
   review         review?  @relation(fields: [review_id], references: [review_id], onDelete: SetNull, onUpdate: NoAction, map: "fk_highlight_review_id")  // review와 연결
 
+  content_id     Int
+  content        content  @relation(fields: [content_id], references: [content_id])
+
   @@index([summary_id], map: "fk_summary_id_idx")
   @@index([review_id], map: "fk_review_id_idx")  
+  @@index([content_id])
 }
 
 model library {
