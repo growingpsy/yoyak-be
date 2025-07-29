@@ -14,7 +14,7 @@ jobs:
     - name: Check Swagger Status
       id: swagger_check
       run: |
-        STATUS=$(curl -o /dev/null -s -w "%{http_code}" https://api.yoyaklery.site/swagger)
+        STATUS=$(curl -o /dev/null -s -w "%{http_code}" https://api.yoyaklery.site/swagger/)
         echo "HTTP_STATUS=$STATUS" >> $GITHUB_ENV
         if [ "$STATUS" -ne 200 ]; then
           echo "Swagger status check failed with $STATUS"
