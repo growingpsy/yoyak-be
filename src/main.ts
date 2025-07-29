@@ -4,11 +4,15 @@ import { ResponseInterceptor } from './interceptors/response.interceptor';
 import { GlobalExceptionFilter } from './filters/http-exception.filter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe, Logger } from '@nestjs/common';
+import * as morgan from 'morgan';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'],
   });
+
+  // HTTP 요청 로그
+  app.use(morgan('dev'));
 
   // 전역 파이프 설정: 유효성 검사 및 변환
   app.useGlobalPipes(
@@ -24,7 +28,7 @@ async function bootstrap() {
   app.useGlobalFilters(new GlobalExceptionFilter());
 
   // CORS 설정
-  const allowedOrigins = ['http://localhost:3000', 'https://yoyaklery.site'];
+  const allowedOrigins = ['http://localhost:3000', 'https://yoyaklery.site', 'https://api.yoyaklery.site',];
   app.enableCors({
     origin: (origin, callback) => {
       if (!origin || allowedOrigins.includes(origin)) {
