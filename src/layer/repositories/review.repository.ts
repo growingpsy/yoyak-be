@@ -8,18 +8,28 @@ export class ReviewRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   // 리뷰 생성
-  async create(createReviewDto: CreateReviewDto) {
-    return this.prisma.review.create({
-      data: createReviewDto,
-    });
-  }
+ async create(createReviewDto: CreateReviewDto) {
+  const { content_id, review_text } = createReviewDto;
+  return this.prisma.review.create({
+    data: {
+      review_text,
+      content: {
+        connect: { content_id },
+      },
+    },
+  });
+}
 
   // 특정 콘텐츠의 리뷰 찾기
-  async findByContent(content_id: number) {
-    return this.prisma.review.findMany({
-      where: { content_id },
-    });
-  }
+ async findByContent(content_id: number) {
+  return this.prisma.review.findMany({
+    where: {
+      content: {
+        content_id: content_id,
+      },
+    },
+  });
+}
 
   // 특정 리뷰 찾기
   async findOne(review_id: number) {
