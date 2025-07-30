@@ -15,8 +15,15 @@ export class AuthController {
   @ApiResponse({ status: 200, description: '로그인 성공' })
   @ApiResponse({ status: 401, description: '인증 실패' })
   async login(@Body() loginDto: LoginDto) {
-    const result = await this.authService.login(loginDto);
-    return new ResponseDto(200, '로그인 성공', result);
+    console.log('받은 loginDto:', loginDto);
+
+    try {
+      const result = await this.authService.login(loginDto);
+      return new ResponseDto(200, '로그인 성공', result);
+    } catch (err) {
+      console.error('로그인 중 에러 발생:', err);
+      throw err;
+    }
   }
 
   @Post('register')
@@ -24,8 +31,7 @@ export class AuthController {
   @ApiResponse({ status: 201, description: '회원가입 성공' })
   @ApiResponse({ status: 400, description: '잘못된 요청' })
   async register(@Body() createUserDto: CreateUserDto) {
-    const result = await this.authService.register(createUserDto);
-    return new ResponseDto(201, '회원가입 성공', result);
+    return new ResponseDto(201, '회원가입 성공', await this.authService.register(createUserDto));
   }
 
   @Post('send-email')
@@ -41,6 +47,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: '카카오 로그인 페이지로 이동합니다.' })
   @UseGuards(AuthGuard('kakao'))
   kakaoAuth() {
+    console.log('카카오 로그인 요청 들어옴');
     return new ResponseDto(200, '카카오 로그인 페이지로 이동합니다', null);
   }
 
@@ -50,7 +57,14 @@ export class AuthController {
   @ApiResponse({ status: 401, description: '카카오 인증 실패' })
   @UseGuards(AuthGuard('kakao'))
   async kakaoAuthCallback(@Req() req) {
-    const result = await this.authService.kakaoLogin(req.user);
-    return new ResponseDto(200, '카카오 로그인 성공', result);
+    console.log('카카오 인증 후 받은 유저:', req.user);
+
+    try {
+      const result = await this.authService.kakaoLogin(req.user);
+      return new ResponseDto(200, '카카오 로그인 성공', result);
+    } catch (err) {
+      console.error('카카오 로그인 처리 중 에러 발생:', err);
+      throw err;
+    }
   }
 }
