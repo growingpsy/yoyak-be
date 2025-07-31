@@ -28,17 +28,28 @@ async function bootstrap() {
   app.useGlobalFilters(new GlobalExceptionFilter());
 
   // CORS 설정
-  const allowedOrigins = ['http://localhost:3000', 'https://yoyaklery.site', 'https://api.yoyaklery.site',];
+  const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://127.0.0.1:3001',
+    'https://yoyaklery.vercel.app',
+    'https://yoyaklery.site',
+    'https://api.yoyaklery.site',
+  ];
+
   app.enableCors({
     origin: (origin, callback) => {
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, origin);
       } else {
+        console.error('차단된 Origin:', origin);
         callback(new Error('Not allowed by CORS'));
       }
     },
+    credentials: true,
     methods: ['GET', 'POST', 'DELETE', 'PATCH', 'PUT', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
+    exposedHeaders: ['Authorization'],
   });
 
   // Swagger 설정

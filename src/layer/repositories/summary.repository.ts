@@ -3,11 +3,15 @@ import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateSummaryDto,UpdateSummaryDto,SummaryResponseDto } from '../dtos/summary.dto';
 
 
+import { IsString, IsNumber, IsBoolean } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+
+
 @Injectable()
 export class SummaryRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(data: CreateSummaryDto) {
+  async create(data: CreateSummaryDto & { user_id: number }) {
     return this.prisma.summary.create({ data });
   }
 
