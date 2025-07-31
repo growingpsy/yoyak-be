@@ -1,81 +1,94 @@
 import { IsString, IsBoolean, IsNumber, IsOptional } from 'class-validator';
-
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateSummaryDto {
+  @ApiProperty({ description: '요약 텍스트' })
   @IsString()
   summary_text!: string;
 
+  @ApiProperty({ description: '요약 제목' })
   @IsString()
   summary_title!: string;
 
+  @ApiProperty({ description: '요약이 속한 에피소드 번호' })
   @IsNumber()
   summary_episode!: number;
 
+  @ApiProperty({ description: '긴 요약 여부' })
   @IsBoolean()
   is_long!: boolean;
 
+  @ApiProperty({ description: '스포일러 여부' })
   @IsBoolean()
   contains_spoiler!: boolean;
 
+  @ApiProperty({ description: '컨텐츠 ID' })
   @IsNumber()
   content_id!: number;
 
-  @IsNumber()
-  user_id!: number;
+
 }
 
 
 export class SummaryResponseDto {
-  @IsNumber()
+  @ApiProperty({ description: '요약 ID' })
   summary_id!: number;
 
-  @IsString()
+  @ApiProperty({ description: '요약 텍스트' })
   summary_text!: string;
 
-  @IsBoolean()
+  @ApiProperty({ description: '요약 제목' })
+  summary_title!: string;
+
+  @ApiProperty({ description: '에피소드 번호' })
+  summary_episode!: number;
+
+  @ApiProperty({ description: '긴 요약 여부' })
   is_long!: boolean;
 
-  @IsBoolean()
+  @ApiProperty({ description: '스포일러 포함 여부' })
   contains_spoiler!: boolean;
 
-  @IsNumber()
+  @ApiProperty({ description: '컨텐츠 ID' })
   content_id!: number;
 
-  @IsNumber()
+  @ApiProperty({ description: '작성자 ID' })
   user_id!: number;
 
-  @IsString()
+  @ApiProperty({ description: '생성일시' })
   created_at!: Date;
 
-  @IsString()
+  @ApiProperty({ description: '수정일시' })
   updated_at!: Date;
 }
 
-
 export class UpdateSummaryDto {
-  @IsString()
-  summaryId!: string;
-
+  @ApiProperty({ description: '요약 제목' })
   @IsString()
   summary_title!: string;
 
+  @ApiProperty({ description: '에피소드 번호' })
   @IsNumber()
   summary_episode!: number;
 
+  @ApiProperty({ description: '요약 텍스트' })
   @IsString()
   summary_text!: string;
 
+  @ApiPropertyOptional({ description: '긴 요약 여부' })
   @IsBoolean()
   @IsOptional()
   is_long?: boolean;
 
+  @ApiPropertyOptional({ description: '스포일러 포함 여부' })
   @IsBoolean()
   @IsOptional()
   contains_spoiler?: boolean;
 
+  @ApiProperty({ description: '컨텐츠 ID' })
   @IsNumber()
   content_id!: number;
 
-  @IsNumber()
-  user_id!: number;
+
 }
+
