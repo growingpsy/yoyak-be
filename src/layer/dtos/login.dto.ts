@@ -4,14 +4,14 @@ import { ApiProperty } from '@nestjs/swagger';
 export class LoginDto {
   @ApiProperty({
     description: '사용자의 이메일 주소',
-    example: 'user@example.com',
+    example: 'yoyak.lib@gmail.com',
   })
   @IsEmail()
   user_email!: string;
 
   @ApiProperty({
     description: '사용자의 비밀번호 (최소 6자 이상)',
-    example: 'password123',
+    example: 'yoyak123!',
     minLength: 6,
   })
   @IsString()
