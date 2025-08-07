@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+// src/modules/comment/services/comment.service.ts
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { CommentRepository } from '../repositories/comment.repository';
 import { CreateCommentDto, UpdateCommentDto } from '../dtos/comment.dto';
 import { PrismaService } from '../../../prisma/prisma.service';
@@ -10,71 +15,68 @@ export class CommentService {
     private readonly prisma: PrismaService,
   ) {}
 
-  // 댓글 생성
-  async createComment(summaryId: number, dto: CreateCommentDto, userId: number) {
+  async create(summary_id: number, dto: CreateCommentDto, user_id: number) {
     const summary = await this.prisma.summary.findUnique({
-      where: { summary_id: summaryId },
+      where: { summary_id },
     });
 
     if (!summary) {
-      throw new NotFoundException('Summary를 찾을 수 없습니다.');
+      throw new NotFoundException(`Summary ID ${summary_id}가 존재하지 않습니다.`);
     }
 
-    // 대댓글인 경우 부모 댓글이 존재하는지 확인
     if (dto.comment_parent_id) {
-      const parentComment = await this.commentRepository.findCommentById(dto.comment_parent_id);
-      
-      // 부모 댓글이 해당 summary에 속하는지 확인
-      if (parentComment.summary_id !== summaryId) {
-        throw new NotFoundException('해당 Summary에 속한 부모 댓글이 아닙니다.');
+      const parent = await this.commentRepository.findOne(dto.comment_parent_id);
+      if (!parent || parent.summary_id !== summary_id) {
+        throw new NotFoundException(`해당 Summary에 속한 부모 댓글이 아닙니다.`);
       }
     }
 
-    return this.commentRepository.createComment({
+    return this.commentRepository.create({
       ...dto,
-      summary_id: summaryId,
-      user_id: userId,
+      summary_id,
+      user_id,
     });
   }
 
-  // 댓글 수정
-  async updateComment(summaryId: number, commentId: number, dto: UpdateCommentDto, userId: number) {
-    const comment = await this.commentRepository.findCommentById(commentId);
+  async update(
+    summary_id: number,
+    comment_id: number,
+    dto: UpdateCommentDto,
+    user_id: number,
+  ) {
+    const comment = await this.commentRepository.findOne(comment_id);
 
-    if (comment.summary_id !== summaryId) {
-      throw new NotFoundException('Summary에 해당하는 댓글을 찾을 수 없습니다.');
+    if (!comment || comment.summary_id !== summary_id) {
+      throw new NotFoundException(`Summary에 해당하는 댓글을 찾을 수 없습니다.`);
     }
 
-    if (comment.user_id !== userId) {
-      throw new UnauthorizedException('본인의 댓글만 수정할 수 있습니다.');
+    if (comment.user_id !== user_id) {
+      throw new ForbiddenException('본인의 댓글만 수정할 수 있습니다.');
     }
 
-    // 이미 삭제 표시된 댓글인지 확인
-    const isDeleted = await this.commentRepository.isDeletedComment(commentId);
+    const isDeleted = await this.commentRepository.isDeleted(comment_id);
     if (isDeleted) {
       throw new NotFoundException('이미 삭제된 댓글은 수정할 수 없습니다.');
     }
 
-    return await this.commentRepository.updateComment(commentId, dto);
+    return this.commentRepository.update(comment_id, dto);
   }
 
-  // 댓글 삭제
-  async deleteComment(summaryId: number, commentId: number, userId: number) {
-    const comment = await this.commentRepository.findCommentById(commentId);
+  async delete(summary_id: number, comment_id: number, user_id: number) {
+    const comment = await this.commentRepository.findOne(comment_id);
 
-    if (comment.summary_id !== summaryId) {
-      throw new NotFoundException('Summary에 해당하는 댓글을 찾을 수 없습니다.');
+    if (!comment || comment.summary_id !== summary_id) {
+      throw new NotFoundException(`Summary에 해당하는 댓글을 찾을 수 없습니다.`);
     }
 
-    if (comment.user_id !== userId) {
-      throw new UnauthorizedException('본인의 댓글만 삭제할 수 있습니다.');
+    if (comment.user_id !== user_id) {
+      throw new ForbiddenException('본인의 댓글만 삭제할 수 있습니다.');
     }
 
-    return await this.commentRepository.deleteComment(commentId);
+    return this.commentRepository.delete(comment_id);
   }
 
-  // Summary에 대한 댓글 목록 조회
-  async getCommentsBySummary(summaryId: number) {
-    return await this.commentRepository.findCommentsBySummary({ summary_id: summaryId });
+  async findBySummary(summary_id: number) {
+    return this.commentRepository.findBySummary(summary_id);
   }
 }
